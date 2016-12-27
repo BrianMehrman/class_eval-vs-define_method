@@ -1,3 +1,10 @@
+# WIP
+This summary is still in the process of being written.
+TODO:
+
+- Section on closures (procs, lambda, blocks, oh my)
+- update conclusion on closure slowness
+
 # Meta Programming
 
 It can be fun at first, but like running with scissors someone may get hurt
