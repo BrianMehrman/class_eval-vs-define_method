@@ -8,6 +8,7 @@ An instance object doesnt contain the definition of its class methods. Class met
 
 ## Go One Step Right then Up
 This is the way most people describe Ruby's method lookup due to the way people usually draw the diagram to illustrate the behavior.
+
 ![Method Lookup diagram](images/method_lookup.png "Pragmatic Programmers Metaprogramming Ruby Book")
 
 # Ancestors Chain
@@ -33,7 +34,7 @@ end
 ```
 
 
-```
+```RUBY
 test = TestMath.new
 test.class.ancestors
 => [TestMath, Square, Object, Kernel, BasicObject]
@@ -53,7 +54,7 @@ The `class_eval` instantiates a new parser and compiles the source. Each method 
 
 When Ruby compiles the code it will create instructions that `YARV` or whatever Ruby VM you are using. These instructions will differ between different that different ways you can define a method even if the code in that method are basicly the same.
 
-```
+```RUBY
 # Defines the methods normally
 module Foo
   def my_method
