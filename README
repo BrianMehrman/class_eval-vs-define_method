@@ -32,6 +32,7 @@ class TestMath
 end
 ```
 
+
 ```
 test = TestMath.new
 test.class.ancestors
@@ -52,7 +53,7 @@ The `class_eval` instantiates a new parser and compiles the source. Each method 
 
 When Ruby compiles the code it will create instructions that `YARV` or whatever Ruby VM you are using. These instructions will differ between different that different ways you can define a method even if the code in that method are basicly the same.
 
-```RUBY
+```
 # Defines the methods normally
 module Foo
   def my_method
@@ -108,7 +109,7 @@ Above we have three modules that each implement the same method in different way
 With the help of RubyVM's `RubyVM::InstructionSequence` we can get a human readable string of instruction sequences for a specific method. Using the `disassemble` method we will see each instruction.
 
 ## Using `def`
-```RUBY
+```
 irb(main):023:0> puts RubyVM::InstructionSequence.disasm(normally_defined.method(:my_method))
 == disasm: <RubyVM::InstructionSequence:my_method@/Users/brian.mehrman/ruby_projects/lightning_talks/class_eval-vs-define_method/dynamic_methods.rb>
 0000 trace            8                                               (  20)
@@ -119,7 +120,7 @@ irb(main):023:0> puts RubyVM::InstructionSequence.disasm(normally_defined.method
 ```
 
 ## Using `class_eval`
-```RUBY
+```
 irb(main):019:0> puts RubyVM::InstructionSequence.disasm(class_evaluated.method(:my_method))
 == disasm: <RubyVM::InstructionSequence:my_method@(class_evaluated)>===============
 0000 trace            8                                               (   1)
@@ -130,7 +131,7 @@ irb(main):019:0> puts RubyVM::InstructionSequence.disasm(class_evaluated.method(
 ```
 
 ## Using `define_method`
-```RUBY
+```
 irb(main):020:0> puts RubyVM::InstructionSequence.disasm(dynamiclly_evaluated.method(:my_method))
 == disasm: <RubyVM::InstructionSequence:block in <module:DefineFoo>@/Users/brian.mehrman/ruby_projects/lightning_talks/class_eval-vs-define_method/dynamic_methods.rb>
 == catch table
