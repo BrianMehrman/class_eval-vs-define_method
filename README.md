@@ -1,63 +1,17 @@
-# WIP
-This summary is still in the process of being written.
-TODO:
-
-- Section on closures (procs, lambda, blocks, oh my)
-- update conclusion on closure slowness
-
 # Meta Programming
 
-It can be fun at first, but like running with scissors someone may get hurt
+Having to write redundant methods can lead to hundreds of lines of code that can
+be hard to maintain. Meta programming provides us with tools that allow us to
+write code that writes its self.
 
-
-# Method Lookup
-An instance object doesnt contain the definition of its class methods. Class method of an instance are stored on the class or module. When a call a method on a instance object Ruby up a heirarchy of classes and methods until it finds the method being called.
-
-## Go One Step Right then Up
-This is the way most people describe Ruby's method lookup due to the way people usually draw the diagram to illustrate the behavior.
-
-![Method Lookup diagram](images/method_lookup.png "Pragmatic Programmers Metaprogramming Ruby Book")
-
-# Ancestors Chain
-When a class inherits from another class or a module is included in a class those methods that are defined in those classes and modules are placed into an ancestor chain. This ancestor chain is what is used to determine what methods or classes to look at when doing the method lookup on an instance object.
-
-# Class Eval
+## Class Eval
 Class eval opens the class and adds the method to the class itself. While this takes longer to define a method it puts the new method in the ancestor chain where it can be accessed quicker than if you used define_method.
 
-```RUBY
-module Square
-  class_eval <<-RUBY
-    def eval_square(x)
-    x + x
-    end
-  RUBY
-end
-```
-
-```RUBY
-class TestMath
-  include Square
-end
-```
-
-
-```RUBY
-test = TestMath.new
-test.class.ancestors
-=> [TestMath, Square, Object, Kernel, BasicObject]
-```
-
-# Define Method
-
-
+## Define Method
 
 Define method, while faster to create the method definition it has a little overhead that will slow the methods execution down. While this performance hit is relatively small it has an accumulative effect that can slow down code if the method is called multiple times in a row.
 
-The `class_eval` instantiates a new parser and compiles the source. Each method definition in the `class_eval` version does not share instruction sequences, where the `define_method` version does.
-
-
-
-# Instruction Sequence
+## Instruction Sequence
 
 When Ruby compiles the code it will create instructions that `YARV` or whatever Ruby VM you are using. These instructions will differ between different that different ways you can define a method even if the code in that method are basicly the same.
 
@@ -85,7 +39,6 @@ module DefineFoo
   end
 end
 
-
 # Base Class
 class MyClass
   def my_method
@@ -112,11 +65,16 @@ class_evaluated = CEClass.new
 dynamiclly_defined = DMClass.new
 normally_defined = MySubclass.new
 ```
-Above we have three modules that each implement the same method in different ways; `def`, `class_eval`, and `define_method`. Each module has been included in its own class.
 
-With the help of RubyVM's `RubyVM::InstructionSequence` we can get a human readable string of instruction sequences for a specific method. Using the `disassemble` method we will see each instruction.
+Above we have three modules that each implement the same method in different ways;
+`def`, `class_eval`, and `define_method`. Each module has been included in its own
+class.
 
-## Using `def`
+With the help of RubyVM's `RubyVM::InstructionSequence` we can get a human readable
+string of instruction sequences for a specific method. Using the `disassemble` method
+we will see each instruction.
+
+### Using `def`
 ```
 irb(main):023:0> puts RubyVM::InstructionSequence.disasm(normally_defined.method(:my_method))
 == disasm: <RubyVM::InstructionSequence:my_method@/Users/brian.mehrman/ruby_projects/lightning_talks/class_eval-vs-define_method/dynamic_methods.rb>
@@ -127,7 +85,7 @@ irb(main):023:0> puts RubyVM::InstructionSequence.disasm(normally_defined.method
 0008 leave                                                            (  21)
 ```
 
-## Using `class_eval`
+### Using `class_eval`
 ```
 irb(main):019:0> puts RubyVM::InstructionSequence.disasm(class_evaluated.method(:my_method))
 == disasm: <RubyVM::InstructionSequence:my_method@(class_evaluated)>===============
@@ -138,7 +96,7 @@ irb(main):019:0> puts RubyVM::InstructionSequence.disasm(class_evaluated.method(
 0008 leave                                                            (   2)
 ```
 
-## Using `define_method`
+### Using `define_method`
 ```
 irb(main):020:0> puts RubyVM::InstructionSequence.disasm(dynamiclly_evaluated.method(:my_method))
 == disasm: <RubyVM::InstructionSequence:block in <module:DefineFoo>@/Users/brian.mehrman/ruby_projects/lightning_talks/class_eval-vs-define_method/dynamic_methods.rb>
@@ -152,10 +110,61 @@ irb(main):020:0> puts RubyVM::InstructionSequence.disasm(dynamiclly_evaluated.me
 0006 trace            512                                             (  15)
 0008 leave                                                            (  14)
 ```
-At a quick glance we can see a major difference between the instructions for the method created using `define_method`. This extra step helps to slow down the methods execution.
+
+At a quick glance we can see a major difference between the instructions for the
+method created using `define_method`. This extra step helps to slow down the methods
+execution. What is this extra step from, one word 'closures'.
+
+## Closures
+
+Blocks, Procs, and Lambdas are types of closures that are used everyday. A closure
+simply put is a self contained section of code that can be passed around that you
+can execute at a later point in your code.
+
+```RUBY
+arr = [1,2,3]
+
+
+# Block
+def log(&block)
+  block.call
+end
+
+log do
+  puts arr.first
+end
+
+# Proc
+log = Proc.new { |arg| puts arg }
+log.call(arr.first)
+
+# Lambdas
+log = lambda { |arg| puts arg }
+log.call(arr.first)
+```
+
+These closures can be great to store code that you need to execute later, however
+executing that code later comes at a performance cost.
+
+In the case of `define_method`, the block passed to define_method is stored for use
+later by `instance_eval`. It is not clear exactly when the `instance_eval` happen,
+whether it is when the method is defined or when it is executed is not entirely
+clear.
+
+The `class_eval` instantiates a new parser and compiles the source. Each method
+definition in the `class_eval` version does not share instruction sequences,
+where the `define_method` version does.
 
 # Conclusion
 
-While `define_method` is quick to create your method it is slower to execute. It also is placed higher up the ancestor chain, slowing the method lookup as well. Define method is great when you need to create a method that will be used in low volume. Using `class_eval` is slower to define the method, yet it provides the benefit of executing faster than if it were defined using `define_method`. The methods defined using `class_eval` also are placed lower in the ancestor chain.
+While `define_method` is quick to create your method it is slower to execute. It
+also is placed higher up the ancestor chain, slowing the method lookup as well.
+Define method is great when you need to create a method that will be used in low
+volume. Using `class_eval` is slower to define the method, yet it provides the
+benefit of executing faster than if it were defined using `define_method`. The
+methods defined using `class_eval` also are placed lower in the ancestor chain.
 
-Meta-programming is a great way to dry up your code and create code that can essentially write itself. This benefit comes at a cost, knowing what that cost is can help in deciding what approach you show take.
+Meta-programming is a great way to dry up your code and create code that can
+essentially write itself. This benefit comes at a cost, either at compile time
+or at run time. Knowing what that cost is can help in deciding what approach you
+show take.

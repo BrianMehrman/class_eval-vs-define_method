@@ -1,14 +1,16 @@
 # Defines the methods normally
 module Foo
   def my_method
-    'module method'
+    "text"
+    # 'module method'
   end
 end
 # Defines the methods using class_eval
 module ClassFoo
   class_eval <<-RUBY
     def my_method
-      'Class evaluated method'
+      "text"
+      # 'Class evaluated method'
     end
   RUBY
 end
@@ -16,7 +18,8 @@ end
 # Defines the methods using define_method
 module DefineFoo
   define_method 'my_method' do
-    'Define method method'
+    "text"
+    # 'Define method method'
   end
 end
 
@@ -39,17 +42,14 @@ end
 
 # Base Class
 class MyClass
-  def yield_here
-    yield
-  end
-
   def my_method
-    'class method'
+    "text"
+    # 'class method'
   end
 end
 
 # Subclass normal methods
-class MySubclass < MyClass
+class MySubClass < MyClass
   include Foo
 end
 
@@ -80,7 +80,8 @@ class InstanceEvalClass < MyClass
   def initialize
     self.instance_eval {
       def my_method
-        "instance eval method"
+        "text"
+        # "instance eval method"
       end
     }
   end

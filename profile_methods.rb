@@ -17,7 +17,7 @@ def execute
   # RubyProf.measure_mode = RubyProf::PROCESS_TIME
   # RubyProf.measure_mode = RubyProf::CPU_TIME
   # RubyProf.measure_mode = RubyProf::ALLOCATIONS
-  RubyProf.measure_mode = RubyProf::MEMORY
+  # RubyProf.measure_mode = RubyProf::MEMORY
   # RubyProf.measure_mode = RubyProf::GC_TIME
   # RubyProf.measure_mode = RubyProf::GC_RUNS
   # profile the code

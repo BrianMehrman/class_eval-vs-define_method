@@ -1,6 +1,6 @@
 require 'benchmark/ips'
 require './dynamic_methods.rb'
-a = MySubclass.new
+a = MySubClass.new
 b = CEClass.new
 c = DMClass.new
 d = PreDMClass.new
@@ -35,7 +35,8 @@ Benchmark.ips do |x|
 
   x.report('block method') do
     e.my_method do
-      'block method'
+      # 'block method'
+      'text'
     end
   end
 
