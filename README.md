@@ -4,12 +4,37 @@ Having to write redundant methods can lead to hundreds of lines of code that can
 be hard to maintain. Meta programming provides us with tools that allow us to
 write code that writes its self.
 
+
+
 ## Class Eval
-Class eval opens the class and adds the method to the class itself. While this takes longer to define a method it puts the new method in the ancestor chain where it can be accessed quicker than if you used define_method.
+`class_eval` opens the class and adds the method to the class itself. While this takes longer to define a method it puts the new method in the ancestor chain where it can be accessed quicker than if you used define_method.
+
+```RUBY
+class Test; end
+
+Test.class_eval("def new_method() 1+1 end")
+```
+
 
 ## Define Method
 
-Define method, while faster to create the method definition it has a little overhead that will slow the methods execution down. While this performance hit is relatively small it has an accumulative effect that can slow down code if the method is called multiple times in a row.
+`define_method` will define an instance method on the receiver using the block or
+Proc. While faster to create the method it has a little overhead that will slow the methods execution down. While this performance hit is relatively small it has an accumulative effect that can slow down code if the method is called multiple times in a row.
+
+```RUBY
+
+class Test; end
+
+Test.define_method(:new_method) do
+  1 + 1
+end
+
+# or using a proc
+
+a_proc = Proc.new { 1 + 1 }
+Test.define_method(:another_method, a_proc)
+```
+
 
 ## Instruction Sequence
 
@@ -115,6 +140,7 @@ At a quick glance we can see a major difference between the instructions for the
 method created using `define_method`. This extra step helps to slow down the methods
 execution. What is this extra step from, one word 'closures'.
 
+
 ## Closures
 
 Blocks, Procs, and Lambdas are types of closures that are used everyday. A closure
@@ -154,6 +180,7 @@ clear.
 The `class_eval` instantiates a new parser and compiles the source. Each method
 definition in the `class_eval` version does not share instruction sequences,
 where the `define_method` version does.
+
 
 # Conclusion
 

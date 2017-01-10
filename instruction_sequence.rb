@@ -13,5 +13,8 @@ puts report_instructions(CEClass.new.method(:my_method))
 puts "\nDefine Method Instructions\n-----------------------"
 puts report_instructions(DMClass.new.method(:my_method))
 
+puts "\nDefine Method using Proc Instructions\n-----------------------"
+puts report_instructions(ProcClass.new.method(:my_method))
+
 puts "\nBlock Technique Instructions\n-----------------------"
 puts RubyVM::InstructionSequence.new('BlockClass.new.my_method do "text" end').disasm

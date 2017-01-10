@@ -1,16 +1,14 @@
 # Defines the methods normally
 module Foo
   def my_method
-    "text"
-    # 'module method'
+    'text'
   end
 end
 # Defines the methods using class_eval
 module ClassFoo
   class_eval <<-RUBY
     def my_method
-      "text"
-      # 'Class evaluated method'
+      'text'
     end
   RUBY
 end
@@ -18,33 +16,30 @@ end
 # Defines the methods using define_method
 module DefineFoo
   define_method 'my_method' do
-    "text"
-    # 'Define method method'
+    'text'
   end
-end
-
-# Defines a method that uses a block to get its job done
-module BlockFoo
-  class_eval <<-RUBY
-    def my_method
-      yield
-    end
-  RUBY
 end
 
 # Define method with a Proc
 module ProcFoo
   P = proc { 'proc method' }
+
+  define_method :my_method, P
+end
+
+# Defines a method that uses a block to get its job done
+module BlockFoo
+  class_eval <<-RUBY
   def my_method
-    P.call
+    yield
   end
+  RUBY
 end
 
 # Base Class
 class MyClass
   def my_method
-    "text"
-    # 'class method'
+    'text'
   end
 end
 
@@ -80,8 +75,7 @@ class InstanceEvalClass < MyClass
   def initialize
     self.instance_eval {
       def my_method
-        "text"
-        # "instance eval method"
+        'text'
       end
     }
   end
