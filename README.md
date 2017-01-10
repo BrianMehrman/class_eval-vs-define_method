@@ -13,13 +13,16 @@ write code that writes its self.
 class Test; end
 
 Test.class_eval("def new_method() 1+1 end")
+
+t = Test.new
+t.new_method # => 2
 ```
 
 
 ## Define Method
 
 `define_method` will define an instance method on the receiver using the block or
-Proc. While faster to create the method it has a little overhead that will slow the methods execution down. While this performance hit is relatively small it has an accumulative effect that can slow down code if the method is called multiple times in a row.
+Proc provided. While faster to create the method it has a little overhead that will slow the methods execution down. While this performance hit is relatively small it has an accumulative effect that can slow down code if the method is called multiple times in a row.
 
 ```RUBY
 
@@ -33,12 +36,16 @@ end
 
 a_proc = Proc.new { 1 + 1 }
 Test.define_method(:another_method, a_proc)
+
+t = Test.new
+t.new_method # => 2
+t.another_method # => 2
 ```
 
 
 ## Instruction Sequence
 
-When Ruby compiles the code it will create instructions that `YARV` or whatever Ruby VM you are using. These instructions will differ between different that different ways you can define a method even if the code in that method are basicly the same.
+When Ruby compiles the code it will create instructions that `YARV`. These instructions will differ between different that different ways you can define a method even if the code in that method are basically the same.
 
 ```RUBY
 # Defines the methods normally
@@ -173,7 +180,7 @@ These closures can be great to store code that you need to execute later, howeve
 executing that code later comes at a performance cost.
 
 In the case of `define_method`, the block passed to define_method is stored for use
-later by `instance_eval`. It is not clear exactly when the `instance_eval` happen,
+later by `instance_eval`. It is not clear exactly when the `instance_eval` occurs,
 whether it is when the method is defined or when it is executed is not entirely
 clear.
 
